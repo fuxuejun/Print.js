@@ -1,4 +1,4 @@
-declare type PrintTypes = 'pdf' | 'html' | 'image' | 'json';
+declare type PrintTypes = 'pdf' | 'html' | 'image' | 'json' | 'raw-html';
 
 export interface Configuration {
   printable: any;
@@ -33,6 +33,7 @@ export interface Configuration {
   onPdfOpen?: () => void;
 }
 
-declare var printJS: (params: string | Configuration) => void;
+declare function printJS(source: string, type?: PrintTypes): void;
+declare function printJS(configuration: Configuration): void;
 
 export default printJS;

@@ -4,10 +4,11 @@ import Browser from './browser'
 import Modal from './modal'
 import Pdf from './pdf'
 import Html from './html'
+import RawHtml from './raw-html'
 import Image from './image'
 import Json from './json'
 
-let printTypes = ['pdf', 'html', 'image', 'json']
+const printTypes = ['pdf', 'html', 'image', 'json', 'raw-html']
 
 export default {
   init () {
@@ -31,6 +32,7 @@ export default {
       onLoadingEnd: null,
       onPrintDialogClose: null,
       onPdfOpen: null,
+      onBrowserIncompatible: () => true,
       modalMessage: 'Retrieving Document...',
       frameId: 'printJS',
       htmlData: '',
@@ -42,7 +44,8 @@ export default {
       repeatTableHeader: true,
       css: null,
       style: null,
-      scanStyles: true
+      scanStyles: true,
+      base64: false
     }
 
     // Check if a printable document or object was supplied
@@ -76,6 +79,7 @@ export default {
         params.onLoadingEnd = typeof args.onLoadingEnd !== 'undefined' ? args.onLoadingEnd : params.onLoadingEnd
         params.onPrintDialogClose = typeof args.onPrintDialogClose !== 'undefined' ? args.onPrintDialogClose : params.onPrintDialogClose
         params.onPdfOpen = typeof args.onPdfOpen !== 'undefined' ? args.onPdfOpen : params.onPdfOpen
+        params.onBrowserIncompatible = typeof args.onBrowserIncompatible !== 'undefined' ? args.onBrowserIncompatible : params.onBrowserIncompatible
         params.modalMessage = typeof args.modalMessage !== 'undefined' ? args.modalMessage : params.modalMessage
         params.documentTitle = typeof args.documentTitle !== 'undefined' ? args.documentTitle : params.documentTitle
         params.targetStyle = typeof args.targetStyle !== 'undefined' ? args.targetStyle : params.targetStyle
@@ -86,6 +90,7 @@ export default {
         params.css = typeof args.css !== 'undefined' ? args.css : params.css
         params.style = typeof args.style !== 'undefined' ? args.style : params.style
         params.scanStyles = typeof args.scanStyles !== 'undefined' ? args.scanStyles : params.scanStyles
+        params.base64 = typeof args.base64 !== 'undefined'
         break
       default:
         throw new Error('Unexpected argument type! Expected "string" or "object", got ' + typeof args)
@@ -147,9 +152,11 @@ export default {
         if (Browser.isFirefox() || Browser.isEdge() || Browser.isIE()) {
           try {
             console.info('PrintJS currently doesn\'t support PDF printing in Firefox, Internet Explorer and Edge.')
-            let win = window.open(params.fallbackPrintable, '_blank')
-            win.focus()
-            if (params.onPdfOpen) params.onPdfOpen()
+            if (params.onBrowserIncompatible() === true) {
+              let win = window.open(params.fallbackPrintable, '_blank')
+              win.focus()
+              if (params.onPdfOpen) params.onPdfOpen()
+            }
           } catch (e) {
             params.onError(e)
           } finally {
@@ -166,6 +173,9 @@ export default {
         break
       case 'html':
         Html.print(params, printFrame)
+        break
+      case 'raw-html':
+        RawHtml.print(params, printFrame)
         break
       case 'json':
         Json.print(params, printFrame)
