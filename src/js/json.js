@@ -27,6 +27,7 @@ export default {
       return {
         field: typeof property === 'object' ? property.field : property,
         displayName: typeof property === 'object' ? property.displayName : property,
+        nested: typeof property === 'object' ? property.nested : false,
         // check if valid formatter
         formatter: typeof property === 'object' && property.formatter && typeof property.formatter === 'function' && property.formatter.length > 2 ? property.formatter : undefined,
         columnSize: typeof property === 'object' && property.columnSize ? property.columnSize + ';' : 100 / params.properties.length + '%;'
@@ -97,7 +98,7 @@ function jsonToHTML (params) {
 
       // Support nested objects
       let property = properties[n].field.split('.')
-      if (property.length > 1) {
+      if (property.length > 1 && properties[n].nested) {
         for (let p = 0; p < property.length; p++) {
           stringData = stringData[property[p]]
         }

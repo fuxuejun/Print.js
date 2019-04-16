@@ -151,7 +151,8 @@
 
        } // wrong parameter length
      },{
-       field: 'test3',
+       field: 'XBDM_GB/T 2261.1-2003',
+       nested: false,
        displayName: 'sex',
        formatter: function(arg1, args2, args3){
          return args3
@@ -168,7 +169,7 @@
        data.push({
          test1: createRandomString(),
          test2: createRandomString(),
-         test3: createRandomString(),
+         "XBDM_GB/T 2261.1-2003": createRandomString(),
          test4: createRandomString()
        })
      }
